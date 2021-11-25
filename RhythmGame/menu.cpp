@@ -30,11 +30,13 @@ void CreateLine(char string[], int length, bool selected) {
 	strcpy(&string[strlen(string)], "│\n");
 }
 
-char* CreateRotateString(const char* text) {
+const char* CreateRotateString(const char* text) {
 	int length = strlen(text);
-	char* string = new char(length * 3 + 1);// (char*)malloc(sizeof(char) * length * 3 + 1);
+	char* string = (char*)malloc(sizeof(char) * length * 3 + 1);
+	if (string == nullptr)
+		return "에러 발생";
 	strcpy(string, text);
-	memset(string + length, ' ', length);
+	memset(string + length, ' ', length); // Heap Corruption
 	strcpy(string + length * 2, text);
 	string[length * 3] = '\00';
 	return string;
@@ -160,8 +162,8 @@ void Settings() {
 					KeyList[selected_index] = key_code;
 				if (key_code >= 'a' && key_code <= 'z')
 					KeyList[selected_index] = key_code;
-				if (key_code >= 'A' && key_code <= 'Z')
-					KeyList[selected_index] = key_code + ('a' - 'A');
+				//if (key_code >= 'A' && key_code <= 'Z')
+				//	KeyList[selected_index] = key_code + ('a' - 'A');
 			}
 
 			if (key_code == 13) {

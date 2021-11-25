@@ -14,6 +14,7 @@
 
 using namespace std;
 
+char KeyList[] = { 'a', 's', 'd', 'f' };
 char screenText[65535];
 //int main()
 //{

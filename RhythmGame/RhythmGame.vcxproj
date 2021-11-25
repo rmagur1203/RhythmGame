@@ -24,6 +24,7 @@
     <ProjectGuid>{588dda16-699b-4578-b5aa-813df659afcb}</ProjectGuid>
     <RootNamespace>RhythmGame</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>RhythmGame</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -149,6 +150,7 @@
     <ClInclude Include="double_buffer.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="treasury.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="music_0.wav">
