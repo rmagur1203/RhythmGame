@@ -166,10 +166,12 @@ void CheckClick() {
 	}
 }
 
-void CopyNotes() {
-	for (int i = 0; i < sizeof(musicNote_0) / sizeof(Note); i++) {
-		const Note now = musicNote_0[i];
-		waitnote[now.location].push_back(now.timing);
+void CopyNotes(const int musicIndex) {
+	if (musicIndex == 0) {
+		for (int i = 0; i < sizeof(musicNote_0) / sizeof(Note); i++) {
+			const Note now = musicNote_0[i];
+			waitnote[now.location].push_back(now.timing);
+		}
 	}
 }
 
@@ -188,7 +190,7 @@ void GamePlay(const int musicIndex) {
 	begin = timeGetTime();
 	memset(noteList, false, 4 * 59);
 
-	CopyNotes();
+	CopyNotes(musicIndex);
 
 	bool play = false;
 	
