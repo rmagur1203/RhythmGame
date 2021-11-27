@@ -3,6 +3,7 @@
 #define MENU_SCREEN_HEIGHT 30
 #define GAME_SCREEN_WIDTH 60
 #define GAME_SCREEN_HEIGHT 60
+extern double speed;
 extern char KeyList[];
 extern char screenText[65535];
 const char header_line[] = "忙式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式忖\n";

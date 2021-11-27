@@ -36,7 +36,7 @@ const char* CreateRotateString(const char* text) {
 	if (string == nullptr)
 		return "에러 발생";
 	strcpy(string, text);
-	memset(string + length, ' ', length); // Heap Corruption
+	memset(string + length, ' ', length); // Heap Corruption?
 	strcpy(string + length * 2, text);
 	string[length * 3] = '\00';
 	return string;

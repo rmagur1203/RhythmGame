@@ -6,15 +6,39 @@ int prev;
 double begin;
 bool touched[] = { false, false, false, false };
 
+int score = 0;
+const char* accuracyText = "";
+
+const char pointMap[4][256] = {
+	{"MISS"},
+	{"BAD "},
+	{"GOOD"},
+	{"PERPECT "}
+};
+const int scoreMap[4] = {
+	0,
+	10,
+	25,
+	40
+};
 const char borderline[] = "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■";
 const char emptyline[] = "■                           ㅣ                           ■\n";
 
 bool noteList[59][4];
 
-std::deque<double> k0note;
-std::deque<double> k1note;
-std::deque<double> k2note;
-std::deque<double> k3note;
+std::deque<double> waitnote[4];
+std::deque<double> note[4];
+
+int IntLength(int v) {
+	if (v == 0)
+		return 1;
+	int count = 0;
+	while (v) {
+		v /= 10;
+		count++;
+	}
+	return count;
+}
 
 void CreateNoteLine(char* line, int index) {
 	memset(line, '\0', 255);
@@ -42,8 +66,23 @@ void CreateTouchLine(char* line) {
 	strcpy(&line[strlen(line)], " ■\n");
 }
 
+void CreateBottomScoreLine(char* line) {
+	memset(line, '\0', 255);
+	strcpy(line, "■");
+	strcpy(&line[strlen(line)], accuracyText);
+	int ilen = IntLength(score);
+	int i = 0;
+	if (ilen % 2 == 1) i++;
+	for (; i < 28 - (strlen(accuracyText) + ilen) / 2; i++) {
+		strcpy(&line[strlen(line)], "■");
+	}
+	if (ilen % 2 == 1) strcpy(&line[strlen(line)], " ");
+	sprintf(&line[strlen(line)], "%d", score);
+	strcpy(&line[strlen(line)], "■");
+}
+
 void Drop() {
-	int now = (timeGetTime() * 2) / 100;
+	int now = (timeGetTime() * speed) / 100; // x2 = 배속 x1일때 낙하까지 6초
 	if (prev != now) {
 		prev = now;
 		for (int y = 57; y >= 0; y--) {
@@ -51,10 +90,17 @@ void Drop() {
 				noteList[y + 1][x] = noteList[y][x];
 			}
 		}
+		memset(noteList, false, 4);
 		for (int x = 0; x < 4; x++) {
-			noteList[0][x] = noteList[58][x];
+			if (waitnote[x].size() > 0) {
+				double check = (timeGetTime() - begin) / 1000;
+				if (check >= waitnote[x].front()) {
+					noteList[0][x] = true;
+					note[x].push_back(waitnote[x].front());
+					waitnote[x].pop_front();
+				}
+			}
 		}
-		//memset(noteList, false, 4);
 	}
 }
 
@@ -74,8 +120,57 @@ void DrawGame() {
 		CreateNoteLine(tempStr, i - 1);
 		sprintf(&screenText[strlen(screenText)], tempStr);
 	}
-	sprintf(&screenText[strlen(screenText)], borderline); // 60
+	CreateBottomScoreLine(tempStr);
+	sprintf(&screenText[strlen(screenText)], tempStr); // 60
     ScreenClear();
+}
+
+void CheckClick() {
+	double check = (timeGetTime() - begin) / 1000;
+	double touchdown = 5.15 / speed;
+	for (int x = 0; x < 4; x++) {
+		if (note[x].size() > 0) {
+			if (note[x].size() > 1) {
+				double max = (note[x][0] + (note[x][1] - note[x][0]) / 2) + touchdown;
+				if (check > max) {
+					accuracyText = pointMap[0];
+					score += scoreMap[0];
+					note[x].pop_front();
+					break;
+				}
+			}
+			if ((note[x].front() + touchdown) - check <= -1.0 / speed) {
+				accuracyText = pointMap[0];
+				score += scoreMap[0];
+				note[x].pop_front();
+			}
+			if (touched[x]) {
+				double timing = fabs((note[x].front() + touchdown) - check);
+				if (timing <= 0.75 / speed && timing > 0.5 / speed) {
+					accuracyText = pointMap[1];
+					score += scoreMap[1];
+					note[x].pop_front();
+				}
+				else if (timing <= 0.5 / speed && timing > 0.25 / speed) {
+					accuracyText = pointMap[2];
+					score += scoreMap[2];
+					note[x].pop_front();
+				}
+				else if (timing <= 0.25 / speed) {
+					accuracyText = pointMap[3];
+					score += scoreMap[3];
+					note[x].pop_front();
+				}
+			}
+		}
+	}
+}
+
+void CopyNotes() {
+	for (int i = 0; i < sizeof(musicNote_0) / sizeof(Note); i++) {
+		const Note now = musicNote_0[i];
+		waitnote[now.location].push_back(now.timing);
+	}
 }
 
 // Mixer settings
@@ -92,13 +187,11 @@ void GamePlay(const int musicIndex) {
 
 	begin = timeGetTime();
 	memset(noteList, false, 4 * 59);
+
+	CopyNotes();
+
+	bool play = false;
 	
-	switch (musicIndex) {
-	case 0:
-		PlaySound(TEXT("music_0.wav"), NULL, SND_NODEFAULT | SND_ASYNC);
-		break;
-	}
-	noteList[0][0] = true;
 	// 재생까지 3초 딜레이
 	while (true) {
 		Drop();
@@ -107,6 +200,15 @@ void GamePlay(const int musicIndex) {
 		ScreenFlipping();
 
 		double time = (timeGetTime() - begin) / 1000;
+
+		if (!play && time + 1.45 >= 5.15 / speed) {
+			switch (musicIndex) {
+			case 0:
+				PlaySound(TEXT("music_0.wav"), NULL, SND_NODEFAULT | SND_ASYNC);
+				break;
+			}
+			play = true;
+		}
 
 		short key0 = 0, key1 = 0, key2 = 0, key3 = 0;
 		if (KeyList[0] >= '0' && KeyList[0] <= '9')
@@ -133,7 +235,9 @@ void GamePlay(const int musicIndex) {
 		touched[1] = key1 & 0x8000;
 		touched[2] = key2 & 0x8000;
 		touched[3] = key3 & 0x8000;
+		CheckClick();
 		if (_kbhit()) {
+
 			int key_code = _getch();
 			if (key_code == 27)
 				break;
