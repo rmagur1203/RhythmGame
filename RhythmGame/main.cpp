@@ -14,7 +14,7 @@
 
 using namespace std;
 
-double syncSetting = 1.45;
+double syncSetting = 1.7;
 double speed = 2;
 char KeyList[] = { 'a', 's', 'd', 'f' };
 char screenText[65535];

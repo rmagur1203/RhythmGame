@@ -29,6 +29,8 @@ bool noteList[59][4];
 std::deque<double> waitnote[4];
 std::deque<double> note[4];
 
+std::vector<Note> clicks;
+
 int IntLength(int v) {
 	if (v == 0)
 		return 1;
@@ -189,7 +191,10 @@ void GamePlay(const int musicIndex) {
 
 	begin = timeGetTime();
 	memset(noteList, false, 4 * 59);
-
+	for (int i = 0; i < 4; i++) {
+		note[i].clear();
+		waitnote[i].clear();
+	}
 	CopyNotes(musicIndex);
 
 	bool play = false;
@@ -239,8 +244,11 @@ void GamePlay(const int musicIndex) {
 		touched[3] = key3 & 0x8000;
 		CheckClick();
 		if (_kbhit()) {
-
 			int key_code = _getch();
+			for (int i = 0; i < 4; i++) {
+				if (key_code == KeyList[i])
+					clicks.push_back({ time - syncSetting - 0.9, i });
+			}
 			if (key_code == 27)
 				break;
 		}
@@ -253,6 +261,10 @@ void GamePlay(const int musicIndex) {
 	PlaySound(NULL, NULL, SND_PURGE);
 	ScreenRelease();
 	sprintf_s(str, sizeof(str), "mode con cols=%d lines=%d", MENU_SCREEN_WIDTH, MENU_SCREEN_HEIGHT);
+	/*for (int i = 0; i < clicks.size(); i++) {
+		printf("{ %lf, %d }, ", clicks[i].timing, clicks[i].location);
+	}
+	while (true);*/
 	system(str);
 	ScreenInit();
 }
