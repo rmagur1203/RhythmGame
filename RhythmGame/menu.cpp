@@ -135,16 +135,19 @@ void DrawSettings(int& selected_index, bool& wait_key_select) {
 	CreateLine(tempStr, 8, (selected_index == 3 && (cursor || !wait_key_select)));
 	sprintf(&screenText[strlen(screenText)], tempStr, keystr); // 9
 	sprintf(&screenText[strlen(screenText)], empty_line); // 10
-	sprintf(keystr, "Sync: %lf", syncSetting);
+	sprintf(keystr, "Speed: %lf ", speed);
 	CreateLine(tempStr, strlen(keystr), (selected_index == 4 && (cursor || !wait_key_select)));
 	sprintf(&screenText[strlen(screenText)], tempStr, keystr); // 11
-	for (int i = 12; i < 29; i++)
-		sprintf(&screenText[strlen(screenText)], empty_line); // 12~28
+	sprintf(keystr, "Sync: %lf", syncSetting);
+	CreateLine(tempStr, strlen(keystr), (selected_index == 5 && (cursor || !wait_key_select)));
+	sprintf(&screenText[strlen(screenText)], tempStr, keystr); // 12
+	for (int i = 13; i < 29; i++)
+		sprintf(&screenText[strlen(screenText)], empty_line); // 13~28
 	sprintf(&screenText[strlen(screenText)], footer_line); //29
 }
 
 void Settings() {
-	const int selected_max = 4;
+	const int selected_max = 5;
 	int selected_index = 0;
 	bool wait_key_select = false;
 	while (true) {
@@ -181,10 +184,14 @@ void Settings() {
 			}
 			if (GetAsyncKeyState(0x25) & 0x8000) { //왼쪽 화살표
 				if (selected_index == 4)
+					speed -= 0.05;
+				if (selected_index == 5)
 					syncSetting -= 0.005;
 			}
 			if (GetAsyncKeyState(0x27) & 0x8000) { //오른쪽 화살표
 				if (selected_index == 4)
+					speed += 0.05;
+				if (selected_index == 5)
 					syncSetting += 0.005;
 			}
 			if (key_code == 27)
