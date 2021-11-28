@@ -203,7 +203,7 @@ void GamePlay(const int musicIndex) {
 
 		double time = (timeGetTime() - begin) / 1000;
 
-		if (!play && time + 1.45 >= 5.15 / speed) {
+		if (!play && time + syncSetting >= 5.15 / speed) {
 			switch (musicIndex) {
 			case 0:
 				PlaySound(TEXT("music_0.wav"), NULL, SND_NODEFAULT | SND_ASYNC);
