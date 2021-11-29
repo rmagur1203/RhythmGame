@@ -190,6 +190,7 @@ void GamePlay(const int musicIndex) {
 
 
 	begin = timeGetTime();
+	score = 0;
 	memset(noteList, false, 4 * 59);
 	for (int i = 0; i < 4; i++) {
 		note[i].clear();
@@ -264,7 +265,13 @@ void GamePlay(const int musicIndex) {
 	/*for (int i = 0; i < clicks.size(); i++) {
 		printf("{ %lf, %d }, ", clicks[i].timing, clicks[i].location);
 	}
-	while (true);*/
+	while (true) {
+		if (_kbhit()) {
+			int key_code = _getch();
+			if (key_code == 27)
+				break;
+		}
+	}*/
 	system(str);
 	ScreenInit();
 }
