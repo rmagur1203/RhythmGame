@@ -188,7 +188,6 @@ void GamePlay(const int musicIndex) {
 	ScreenInit();
 	timeBeginPeriod(1);
 
-
 	begin = timeGetTime();
 	score = 0;
 	memset(noteList, false, 4 * 59);
@@ -201,6 +200,23 @@ void GamePlay(const int musicIndex) {
 	bool play = false;
 	
 	// 재생까지 3초 딜레이
+	if (syncSetting >= 0) {
+		switch (musicIndex) {
+		case 0:
+			PlaySound(TEXT("music_0.wav"), NULL, SND_NODEFAULT | SND_ASYNC);
+			break;
+		}
+	}
+	begin = timeGetTime();
+	while (true) {
+		DrawGame();
+		ScreenPrint(0, 0, screenText);
+		ScreenFlipping();
+		double time = (timeGetTime() - begin) / 1000;
+		if (time >= syncSetting)
+			break;
+	}
+	begin = timeGetTime();
 	while (true) {
 		Drop();
 		DrawGame();
@@ -208,8 +224,7 @@ void GamePlay(const int musicIndex) {
 		ScreenFlipping();
 
 		double time = (timeGetTime() - begin) / 1000;
-
-		if (!play && time + syncSetting >= 5.15 / speed) {
+		if (syncSetting < 0 && !play && time >= fabs(syncSetting)) {
 			switch (musicIndex) {
 			case 0:
 				PlaySound(TEXT("music_0.wav"), NULL, SND_NODEFAULT | SND_ASYNC);
